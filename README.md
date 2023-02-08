@@ -11,7 +11,9 @@
 
 ## Installation
 
-`pip install easy-terminal`
+#### `pip install easy-terminal`
+
+##### Require easy-events>=2.2.0
 
 GitHub : [Github](https://github.com/ThePhoenix78/easy-debug)
 
