@@ -35,6 +35,7 @@ class Debug():
             base = func2[0]
             method = func2[-1]
             mid = method
+
             if len(func2) > 2:
                 mid = func.split(".", 1)[-1]
 
@@ -64,6 +65,7 @@ class Debug():
 
                 sync = self.sync.grab_event(is_class[-1], event_type)
                 asyn = self.asyn.grab_event(is_class[-1], event_type)
+
             else:
                 sync = self.sync.grab_event(command._event, None)
                 asyn = self.asyn.grab_event(command._event, None)
@@ -108,21 +110,26 @@ class Debug():
     def event(self, callback: callable, aliases: list = []):
         event_type = None
 
+        if isinstance(aliases, str):
+            aliases = [aliases]
+
         if "." in str(callback):
             event_type = str(callback).split(".")[0].replace("<function ", "")
 
         if asyncio.iscoroutinefunction(callback):
-            self.asyn.event(callback=callback, aliases=[], type=event_type)
+            self.asyn.event(callback=callback, aliases=aliases, type=event_type)
         else:
-            self.sync.event(callback=callback, aliases=[], type=event_type)
+            self.sync.event(callback=callback, aliases=aliases, type=event_type)
+
+        aliases.clear()
 
 
 _cmd = Debug()
 
 
-def terminal():
+def terminal(aliases: list = []):
     def add_debug(func):
-        _cmd.event(callback=func)
+        _cmd.event(callback=func, aliases=aliases)
         return func
 
     return add_debug
@@ -140,7 +147,7 @@ if __name__ == "__main__":
 
     a = A("a")
 
-    @terminal()
+    @terminal("test2")
     async def test(a="a", b="b"):
         print("test", a, b)
 
