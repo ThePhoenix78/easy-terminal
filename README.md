@@ -28,14 +28,50 @@ Add the @terminal() before the function you want to try in the terminal
 from easy_terminal import terminal
 
 
+class A:
+    nb = 1
+
+    def __init__(self, nb=5):
+        self.nb = nb
+
+    @terminal()
+    def hello(self):
+        print("world", self.nb, "\n")
+
+a = A(6)
+
 @terminal()
-def test1():
-	do_action_here
+def hello():
+    print("world\n")
+    
+    
+@terminal()
+def pc(processor: str = "intel", ram: str = "8go"):
+    print(f"processor: {processor}\nram : {ram}\n")
 
 
-@terminal()
-async def test1(arg1, arg2, *, arg3):
-	do_action_here
+"""
+>hello
+world
+
+>A.hello
+world 1
+
+>a.hello
+world 6
+
+>pc
+processor: intel
+ram : 8go
+
+>pc amd
+processor: amd
+ram : 8go
+
+>pc amd 16go
+processor: amd
+ram : 16go
+"""
 
 ```
 
