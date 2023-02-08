@@ -27,6 +27,15 @@ Add the @terminal() before the function you want to try in the terminal
 ```py
 from easy_terminal import terminal
 
+help_msg = """
+pc processor ram    : will print the informations of the pc
+hello               : will print world
+help                : will show this message
+"""
+
+@terminal(aliases=["help"])
+def h():
+    print(help_msg)
 
 class A:
     nb = 1
@@ -71,6 +80,12 @@ ram : 8go
 >pc amd 16go
 processor: amd
 ram : 16go
+
+>help
+
+pc processor ram    : will print the informations of the pc
+hello               : will print world
+help                : will show this message
 """
 
 ```
