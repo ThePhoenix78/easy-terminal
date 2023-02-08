@@ -1,5 +1,5 @@
 from threading import Thread
-from easy_events import *
+from easy_events import Events, AsyncEvents
 import asyncio, time, gc
 
 
@@ -8,6 +8,7 @@ class Debug():
         self.sync = Events(first_parameter_object=False)
         self.asyn = AsyncEvents(first_parameter_object=False)
         Thread(target=self._inputs).start()
+        self.run = True
 
     def get_object(self, object: str):
         for elem in gc.get_objects():
@@ -38,7 +39,7 @@ class Debug():
         return [base, mid, method]
 
     def _inputs(self):
-        while True:
+        while self.run:
             command = input("> ")
 
             if not command:
@@ -93,6 +94,9 @@ class Debug():
 
     def _execute(self, command):
         self.sync.trigger(command, None)
+
+    def stop(self):
+        self.run = False
 
     def event(self, callback: callable):
         event_type = None
