@@ -1,6 +1,6 @@
 from threading import Thread
 from easy_events import *
-import asyncio, time
+import asyncio, time, gc
 
 
 class Debug():
@@ -8,6 +8,13 @@ class Debug():
         self.sync = Events(first_parameter_object=False)
         self.asyn = AsyncEvents(first_parameter_object=False)
         Thread(target=self._inputs).start()
+
+    def get_object(self, object: str):
+        for elem in gc.get_objects():
+            if object in str(elem) and isinstance(elem, dict):
+                val = elem.get(object)
+                if "__main__." in str(val):
+                    return val
 
     def analyse_input(self, command: str):
         result = []
@@ -25,7 +32,7 @@ class Debug():
             if len(func2) > 2:
                 mid = func.split(".", 1)[-1]
 
-            base = globals().get(base)
+            base = self.get_object(base)
 
         if not base:
             return
@@ -100,6 +107,7 @@ class Debug():
         else:
             self.sync.event(callback=callback, aliases=[], type=event_type)
 
+
 _cmd = Debug()
 
 
@@ -112,6 +120,7 @@ def terminal():
 
 
 if __name__ == "__main__":
+
     class Test:
         def __init__(self, name="Test"):
             self.name = name

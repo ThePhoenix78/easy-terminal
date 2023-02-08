@@ -1,1 +1,1 @@
-from .debug import terminal
+from .terminal import terminal
