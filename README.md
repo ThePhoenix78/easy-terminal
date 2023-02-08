@@ -20,7 +20,7 @@ GitHub : [Github](https://github.com/ThePhoenix78/easy-debug)
 
 ## Usages
 
-Add the @debug() before the function you want to try in the terminal
+Add the @terminal() before the function you want to try in the terminal
 
 ## Code example
 
