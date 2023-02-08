@@ -43,11 +43,17 @@ class Debug():
             command = Parameters(command)
 
             if is_class:
-                sync = self.sync.get_event(is_class[-1])
-                asyn = self.asyn.get_event(is_class[-1])
+                event_type = str(is_class[0]).split("__main__.")[1]
+
+                if " " in event_type:
+                    event_type = event_type.split(" ")[0]
+                event_type = event_type.replace("'>", "")
+
+                sync = self.sync.grab_event(is_class[-1], event_type)
+                asyn = self.asyn.grab_event(is_class[-1], event_type)
             else:
-                sync = self.sync.get_event(command._event)
-                asyn = self.asyn.get_event(command._event)
+                sync = self.sync.grab_event(command._event, None)
+                asyn = self.asyn.grab_event(command._event, None)
 
             if (sync or asyn) and is_class:
                 event = getattr(is_class[0], is_class[1])
@@ -71,25 +77,28 @@ class Debug():
 
             time.sleep(.1)
 
-    def event(self, callback: callable):
-        if asyncio.iscoroutinefunction(callback):
-            self.asyn.event(callback=callback, aliases=[])
-        else:
-            self.sync.event(callback=callback, aliases=[])
-
     def _execute_async_class(self, event: callable, parameters: dict):
         asyncio.run(event(**parameters))
 
     def _execute_class(self, event: callable, parameters: dict):
-        print(parameters)
         event(**parameters)
 
     def _execute_async(self, command):
-        asyncio.run(self.asyn.trigger_run(command))
+        asyncio.run(self.asyn.trigger_run(command, None))
 
     def _execute(self, command):
-        self.sync.trigger(command)
+        self.sync.trigger(command, None)
 
+    def event(self, callback: callable):
+        event_type = None
+
+        if "." in str(callback):
+            event_type = str(callback).split(".")[0].replace("<function ", "")
+
+        if asyncio.iscoroutinefunction(callback):
+            self.asyn.event(callback=callback, aliases=[], type=event_type)
+        else:
+            self.sync.event(callback=callback, aliases=[], type=event_type)
 
 _cmd = Debug()
 
@@ -108,7 +117,7 @@ if __name__ == "__main__":
             self.name = name
 
         @terminal()
-        def yo(self, a, b, c):
+        async def yo(self, a, b, c):
             print("plait", a, b, c)
 
     a = Test("a")
@@ -120,3 +129,8 @@ if __name__ == "__main__":
     @terminal()
     def test1(b="b", c="c"):
         print("test1", b, c)
+
+
+    @terminal()
+    def yo():
+        print("gourt")
