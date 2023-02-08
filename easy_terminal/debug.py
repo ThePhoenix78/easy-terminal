@@ -24,13 +24,14 @@ class Debug():
                 Thread(target=self._execute_async, args=[command]).start()
             elif sync:
                 Thread(target=self._execute, args=[command]).start()
+
             time.sleep(.1)
 
     def event(self, callback: callable):
         if asyncio.iscoroutinefunction(callback):
-            self.asyn.event(callback=callback)
+            self.asyn.event(callback=callback, aliases=[])
         else:
-            self.sync.event(callback=callback)
+            self.sync.event(callback=callback, aliases=[])
 
     def _execute_async(self, command):
         asyncio.run(self.asyn.trigger_run(command))
