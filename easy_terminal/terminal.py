@@ -52,15 +52,16 @@ class Debug():
             if (sync or asyn) and is_class:
                 event = getattr(is_class[0], is_class[1])
 
-                if not "__main__" in str(event):
-                    command._parameters = command._parameters.split()
-                    command._parameters.insert(0, is_class[0])
+                command._parameters = command._parameters.split()
+                command._parameters.insert(0, is_class[0])
+                dico = self.sync.build_arguments(event, command._parameters)
+
+                if "__main__" in str(event):
+                    del(dico["self"])
 
                 if asyn:
-                    dico = self.sync.build_arguments(event, command._parameters)
                     Thread(target=self._execute_async_class, args=[event, dico]).start()
                 elif sync:
-                    dico = self.sync.build_arguments(event, command._parameters)
                     Thread(target=self._execute_class, args=[event, dico]).start()
 
             elif asyn:
@@ -80,6 +81,7 @@ class Debug():
         asyncio.run(event(**parameters))
 
     def _execute_class(self, event: callable, parameters: dict):
+        print(parameters)
         event(**parameters)
 
     def _execute_async(self, command):
@@ -106,9 +108,8 @@ if __name__ == "__main__":
             self.name = name
 
         @terminal()
-        def yo(self):
-            print(self)
-            print("plait")
+        def yo(self, a, b, c):
+            print("plait", a, b, c)
 
     a = Test("a")
 
