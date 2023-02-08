@@ -10,10 +10,17 @@ class Debug():
         self.run = True
         Thread(target=self._inputs).start()
 
-    def get_object(self, object: str):
+    def get_object_old(self, object: str):
         for elem in gc.get_objects():
             if isinstance(elem, dict) and f"__main__.{object}" in str(elem):
                 return elem.get(object)
+
+    def get_object(self, object: str):
+        for elem in gc.get_objects():
+            if isinstance(elem, dict) and object in str(elem):
+                val = elem.get(object)
+                if "__main__." in str(val):
+                    return val
 
     def analyse_input(self, command: str):
         result = []
