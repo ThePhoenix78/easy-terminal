@@ -11,10 +11,8 @@ class Debug():
 
     def get_object(self, object: str):
         for elem in gc.get_objects():
-            if object in str(elem) and isinstance(elem, dict):
-                val = elem.get(object)
-                if "__main__." in str(val):
-                    return val
+            if isinstance(elem, dict) and f"__main__.{object}" in str(elem):
+                return elem.get(object)
 
     def analyse_input(self, command: str):
         result = []
@@ -121,15 +119,15 @@ def terminal():
 
 if __name__ == "__main__":
 
-    class Test:
+    class A:
         def __init__(self, name="Test"):
             self.name = name
 
         @terminal()
-        async def yo(self, a, b, c):
+        async def yo(self, a="a", b="b", c="c"):
             print("plait", a, b, c)
 
-    a = Test("a")
+    a = A("a")
 
     @terminal()
     async def test(a="a", b="b"):
