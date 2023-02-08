@@ -1,6 +1,17 @@
 from easy_terminal import terminal
 
 
+help_msg = """
+pc processor ram    : will print the informations of the pc
+hello               : will print world
+help                : will show this message
+"""
+
+@terminal(aliases=["help"])
+def h():
+    print(help_msg)
+
+
 class A:
     nb = 1
 
@@ -18,6 +29,11 @@ def hello():
     print("world\n")
 
 
+@terminal()
+def pc(processor: str = "intel", ram: str = "8go"):
+    print(f"processor: {processor}\nram : {ram}\n")
+
+
 """
 >hello
 world
@@ -27,4 +43,22 @@ world 1
 
 >a.hello
 world 6
+
+>pc
+processor: intel
+ram : 8go
+
+>pc amd
+processor: amd
+ram : 8go
+
+>pc amd 16go
+processor: amd
+ram : 16go
+
+>help
+
+pc processor ram    : will print the informations of the pc
+hello               : will print world
+help                : will show this message
 """
