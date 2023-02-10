@@ -8,6 +8,7 @@ class Debug():
         self.sync = Events(first_parameter_object=False)
         self.asyn = AsyncEvents(first_parameter_object=False)
         self.run = True
+        self.main_function = None
         Thread(target=self._inputs).start()
 
     def get_object_old(self, object: str):
@@ -90,6 +91,20 @@ class Debug():
             elif sync:
                 Thread(target=self._execute, args=[command]).start()
 
+            elif self.main_function:
+                command._parameters = command._parameters.split()
+                command._parameters.insert(0, command._event)
+
+                if self.main_function == "sync":
+                    event = self.sync.get_events_type("__main")[0].event
+                    dico = self.sync.build_arguments(event, command._parameters)
+                    Thread(target=self._execute_class, args=[event, dico]).start()
+
+                elif self.main_function == "async":
+                    event = self.asyn.get_events_type("__main")[0].event
+                    dico = self.sync.build_arguments(event, command._parameters)
+                    Thread(target=self._execute_async_class, args=[event, dico]).start()
+
             time.sleep(.1)
 
     def _execute_async_class(self, event: callable, parameters: dict):
@@ -123,6 +138,14 @@ class Debug():
 
         aliases.clear()
 
+    def main(self, callback: callable):
+        if asyncio.iscoroutinefunction(callback):
+            self.asyn.event(callback=callback, type="__main")
+            self.main_function = "async"
+        else:
+            self.sync.event(callback=callback, type="__main")
+            self.main_function = "sync"
+
 
 _cmd = Debug()
 
@@ -133,6 +156,14 @@ def terminal(aliases: list = []):
         return func
 
     return add_debug
+
+
+def main():
+    def add_main(func):
+        _cmd.main(callback=func)
+        return func
+
+    return add_main
 
 
 if __name__ == "__main__":
@@ -159,3 +190,7 @@ if __name__ == "__main__":
     @terminal()
     def yo():
         print("gourt")
+
+    @main()
+    def magic(magic):
+        print(f"Hello {magic}\n")
