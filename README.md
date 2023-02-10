@@ -21,6 +21,7 @@ GitHub : [Github](https://github.com/ThePhoenix78/easy-debug)
 ## Usages
 
 Add the @terminal() before the function you want to try in the terminal
+Use @main() to redirect any input to the function linked
 
 ## Code example
 
@@ -53,11 +54,16 @@ a = A(6)
 def hello():
     print("world\n")
     
-    
+
 @terminal()
 def pc(processor: str = "intel", ram: str = "8go"):
     print(f"processor: {processor}\nram : {ram}\n")
 
+
+
+@main()
+def main(car: str = "mercedes"):
+    print(f"Your car is a {car}")
 
 """
 >hello
@@ -86,6 +92,10 @@ ram : 16go
 pc processor ram    : will print the informations of the pc
 hello               : will print world
 help                : will show this message
+
+
+>peugot
+Your car is a peugot
 """
 
 ```
