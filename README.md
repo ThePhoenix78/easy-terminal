@@ -62,7 +62,7 @@ def pc(processor: str = "intel", ram: str = "8go"):
 
 
 @main()
-def main(car: str = "mercedes"):
+def principal(car: str = "mercedes"):
     print(f"Your car is a {car}")
 
 """
