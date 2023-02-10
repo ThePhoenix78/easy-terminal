@@ -34,6 +34,10 @@ def pc(processor: str = "intel", ram: str = "8go"):
     print(f"processor: {processor}\nram : {ram}\n")
 
 
+@main()
+def principal(car: str = "mercedes"):
+    print(f"Your car is a {car}")
+
 """
 >hello
 world
