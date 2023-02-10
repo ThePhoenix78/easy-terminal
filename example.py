@@ -1,4 +1,4 @@
-from easy_terminal import terminal
+from easy_terminal import terminal, main
 
 
 help_msg = """
