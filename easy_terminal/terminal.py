@@ -150,13 +150,15 @@ class Debug():
 _cmd = Debug()
 
 
-def terminal(aliases: list = []):
+def terminal(aliases: list = [], callback: callable = None):
     def add_debug(func):
         _cmd.event(callback=func, aliases=aliases)
         return func
 
-    return add_debug
+    if callback:
+        return add_debug(callback)
 
+    return add_debug
 
 def main():
     def add_main(func):
@@ -187,9 +189,10 @@ if __name__ == "__main__":
         print("test1", b, c)
 
 
-    @terminal()
     def yo():
         print("gourt")
+
+    terminal(callback=yo)
 
     @main()
     def magic(magic):
