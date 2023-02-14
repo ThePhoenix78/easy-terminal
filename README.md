@@ -1,6 +1,6 @@
 # easy-terminal
 
-**A library that help you to debug the code in terminal**
+**A library that help you to convert function into terminal command**
 
 ## Getting started
 
@@ -15,7 +15,7 @@
 
 ##### Require easy-events>=2.2.0
 
-GitHub : [Github](https://github.com/ThePhoenix78/easy-debug)
+GitHub : [Github](https://github.com/ThePhoenix78/easy-terminal)
 
 
 ## Usages
@@ -51,7 +51,7 @@ class A:
 a = A(6)
 
 @terminal()
-def hello():
+async def hello():
     print("world\n")
     
 
