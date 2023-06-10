@@ -114,7 +114,7 @@ class Debug():
         event(**parameters)
 
     def _execute_async(self, command):
-        asyncio.run(self.asyn.trigger_run(command, None))
+        asyncio.run(self.asyn.trigger(command, None))
 
     def _execute(self, command):
         self.sync.trigger(command, None)
