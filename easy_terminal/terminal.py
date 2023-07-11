@@ -2,6 +2,7 @@ from threading import Thread
 from easy_events import Events, AsyncEvents, Parameters
 import asyncio, time, gc, copy
 
+print("DEBUG")
 
 class Debug():
     def __init__(self):
@@ -27,7 +28,7 @@ class Debug():
                     return val, "__main__."
 
                 elif "<class " in str(val):
-                    return val, str(val)[8:str(val).index(".", 1)+1]
+                    return val, str(val)[8:-str(val)[::-1].index(".")]
 
 
     def analyse_input(self, command: str):
@@ -71,6 +72,8 @@ class Debug():
                     event_type = event_type.split(" ")[0]
 
                 event_type = event_type.replace("'>", "")
+
+                print(event_type)
 
                 sync = self.sync.grab_event(is_class[-1], event_type)
                 asyn = self.asyn.grab_event(is_class[-1], event_type)
@@ -116,10 +119,16 @@ class Debug():
             time.sleep(.1)
 
     def _execute_async_class(self, event: callable, parameters: dict):
-        asyncio.run(event(**parameters))
-
+        try:
+            asyncio.run(event(**parameters))
+        except Exception:
+            asyncio.run(event())
+            
     def _execute_class(self, event: callable, parameters: dict):
-        event(**parameters)
+        try:
+            event(**parameters)
+        except Exception:
+            event()
 
     def _execute_async(self, command):
         asyncio.run(self.asyn.trigger(command, None))
