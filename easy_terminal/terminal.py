@@ -1,6 +1,6 @@
 from threading import Thread
 from easy_events import Events, AsyncEvents, Parameters
-import asyncio, time, gc
+import asyncio, time, gc, copy
 
 
 class Debug():
@@ -20,8 +20,15 @@ class Debug():
         for elem in gc.get_objects():
             if isinstance(elem, dict) and object in str(elem):
                 val = elem.get(object)
-                if "__main__." in str(val):
-                    return val
+                if not val:
+                    continue
+
+                if "<class __main__." in str(val):
+                    return val, "__main__."
+
+                elif "<class " in str(val):
+                    return val, str(val)[8:str(val).index(".", 1)+1]
+
 
     def analyse_input(self, command: str):
         result = []
@@ -58,10 +65,11 @@ class Debug():
             command = Parameters(command)
 
             if is_class:
-                event_type = str(is_class[0]).split("__main__.")[1]
+                event_type = str(is_class[0][0]).split(is_class[0][1])[1]
 
                 if " " in event_type:
                     event_type = event_type.split(" ")[0]
+
                 event_type = event_type.replace("'>", "")
 
                 sync = self.sync.grab_event(is_class[-1], event_type)
@@ -72,10 +80,10 @@ class Debug():
                 asyn = self.asyn.grab_event(command._event, None)
 
             if (sync or asyn) and is_class:
-                event = getattr(is_class[0], is_class[1])
+                event = getattr(is_class[0][0], is_class[1])
 
                 command._parameters = command._parameters.split()
-                command._parameters.insert(0, is_class[0])
+                command._parameters.insert(0, is_class[0][0])
                 dico = self.sync.build_arguments(event, command._parameters)
 
                 if "__main__" in str(event):
