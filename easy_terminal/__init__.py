@@ -1,1 +1,1 @@
-from .terminal import terminal, main
+from .terminal import terminal, main, trigger

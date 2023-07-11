@@ -2,7 +2,6 @@ from threading import Thread
 from easy_events import Events, AsyncEvents, Parameters
 import asyncio, time, gc, copy
 
-print("DEBUG")
 
 class Debug():
     def __init__(self):
@@ -57,73 +56,71 @@ class Debug():
 
     def _inputs(self):
         while self.run:
-            command = input("> ")
-
-            if not command:
-                continue
-
-            is_class = self.analyse_input(command)
-            command = Parameters(command)
-
-            if is_class:
-                event_type = str(is_class[0][0]).split(is_class[0][1])[1]
-
-                if " " in event_type:
-                    event_type = event_type.split(" ")[0]
-
-                event_type = event_type.replace("'>", "")
-
-                print(event_type)
-
-                sync = self.sync.grab_event(is_class[-1], event_type)
-                asyn = self.asyn.grab_event(is_class[-1], event_type)
-
-            else:
-                sync = self.sync.grab_event(command._event, None)
-                asyn = self.asyn.grab_event(command._event, None)
-
-            if (sync or asyn) and is_class:
-                event = getattr(is_class[0][0], is_class[1])
-
-                command._parameters = command._parameters.split()
-                command._parameters.insert(0, is_class[0][0])
-                dico = self.sync.build_arguments(event, command._parameters)
-
-                if "__main__" in str(event):
-                    del(dico["self"])
-
-                if asyn:
-                    Thread(target=self._execute_async_class, args=[event, dico]).start()
-                elif sync:
-                    Thread(target=self._execute_class, args=[event, dico]).start()
-
-            elif asyn:
-                Thread(target=self._execute_async, args=[command]).start()
-            elif sync:
-                Thread(target=self._execute, args=[command]).start()
-
-            elif self.main_function:
-                command._parameters = command._parameters.split()
-                command._parameters.insert(0, command._event)
-
-                if self.main_function == "sync":
-                    event = self.sync.get_events_type("__main")[0].event
-                    dico = self.sync.build_arguments(event, command._parameters)
-                    Thread(target=self._execute_class, args=[event, dico]).start()
-
-                elif self.main_function == "async":
-                    event = self.asyn.get_events_type("__main")[0].event
-                    dico = self.sync.build_arguments(event, command._parameters)
-                    Thread(target=self._execute_async_class, args=[event, dico]).start()
-
+            self._trigger(input("> "))
             time.sleep(.1)
+
+    def _trigger(self, command: str = None):
+        if not command:
+            return
+
+        is_class = self.analyse_input(command)
+        command = Parameters(command)
+
+        if is_class:
+            event_type = str(is_class[0][0]).split(is_class[0][1])[1]
+
+            if " " in event_type:
+                event_type = event_type.split(" ")[0]
+
+            event_type = event_type.replace("'>", "")
+
+            sync = self.sync.grab_event(is_class[-1], event_type)
+            asyn = self.asyn.grab_event(is_class[-1], event_type)
+
+        else:
+            sync = self.sync.grab_event(command._event, None)
+            asyn = self.asyn.grab_event(command._event, None)
+
+        if (sync or asyn) and is_class:
+            event = getattr(is_class[0][0], is_class[1])
+
+            command._parameters = command._parameters.split()
+            command._parameters.insert(0, is_class[0][0])
+            dico = self.sync.build_arguments(event, command._parameters)
+
+            if "__main__" in str(event):
+                del(dico["self"])
+
+            if asyn:
+                Thread(target=self._execute_async_class, args=[event, dico]).start()
+            elif sync:
+                Thread(target=self._execute_class, args=[event, dico]).start()
+
+        elif asyn:
+            Thread(target=self._execute_async, args=[command]).start()
+        elif sync:
+            Thread(target=self._execute, args=[command]).start()
+
+        elif self.main_function:
+            command._parameters = command._parameters.split()
+            command._parameters.insert(0, command._event)
+
+            if self.main_function == "sync":
+                event = self.sync.get_events_type("__main")[0].event
+                dico = self.sync.build_arguments(event, command._parameters)
+                Thread(target=self._execute_class, args=[event, dico]).start()
+
+            elif self.main_function == "async":
+                event = self.asyn.get_events_type("__main")[0].event
+                dico = self.sync.build_arguments(event, command._parameters)
+                Thread(target=self._execute_async_class, args=[event, dico]).start()
 
     def _execute_async_class(self, event: callable, parameters: dict):
         try:
             asyncio.run(event(**parameters))
         except Exception:
             asyncio.run(event())
-            
+
     def _execute_class(self, event: callable, parameters: dict):
         try:
             event(**parameters)
@@ -183,6 +180,10 @@ def main():
         return func
 
     return add_main
+
+
+def trigger(command: str = None):
+    return _cmd._trigger(command)
 
 
 if __name__ == "__main__":
