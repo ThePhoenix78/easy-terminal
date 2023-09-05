@@ -13,7 +13,7 @@
 
 #### `pip install easy-terminal`
 
-##### Require easy-events>=2.9.0
+##### Require easy-events>=2.11.3
 
 GitHub : [Github](https://github.com/ThePhoenix78/easy-terminal)
 
