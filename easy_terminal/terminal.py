@@ -11,11 +11,6 @@ class Debug():
         self.main_function = None
         Thread(target=self._inputs).start()
 
-    def get_object_old(self, object: str):
-        for elem in gc.get_objects():
-            if isinstance(elem, dict) and f"__main__.{object}" in str(elem):
-                return elem.get(object)
-
     def get_object(self, object: str):
         for elem in gc.get_objects():
             if isinstance(elem, dict) and object in str(elem):
@@ -28,7 +23,6 @@ class Debug():
 
                 elif "<class " in str(val):
                     return val, str(val)[8:-str(val)[::-1].index(".")]
-
 
     def analyse_input(self, command: str):
         result = []
@@ -84,8 +78,8 @@ class Debug():
         if (sync or asyn) and is_class:
             event = getattr(is_class[0][0], is_class[1])
 
-            command._parameters = command._parameters.split()
-            command._parameters.insert(0, is_class[0][0])
+            command._parameters._default = command._parameters._default or []
+            command._parameters._default.insert(0, is_class[0][0])
             dico = self.sync.build_arguments(event, command._parameters)
 
             if "__main__" in str(event):
@@ -102,8 +96,8 @@ class Debug():
             Thread(target=self._execute, args=[command]).start()
 
         elif self.main_function:
-            command._parameters = command._parameters.split()
-            command._parameters.insert(0, command._event)
+            command._parameters._default = command._parameters._default or []
+            command._parameters._default.insert(0, command._event)
 
             if self.main_function == "sync":
                 event = self.sync.get_events_type("__main")[0].event
